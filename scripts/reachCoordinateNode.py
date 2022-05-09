@@ -21,7 +21,7 @@ ActionClient:
 import rospy
 import os
 import actionlib
-from assignment_3.srv import reachCoordinateService 
+from RT2_jpy_assignment.srv import reachCoordinateService 
 from move_base_msgs.msg import *
 from actionlib_msgs.msg import *
 

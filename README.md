@@ -19,6 +19,7 @@ roslaunch RT2_jpy_assignment jpy_launch.launch
 ```
 NB_assignment_3.ipynb
 ```
+For a better use of the graphical interface I recommend hiding the code inside the notebook environment.
  
 
 ## Structure of the code
