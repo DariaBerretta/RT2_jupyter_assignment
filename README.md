@@ -1,21 +1,11 @@
-# Research Track 1: assignment n. 03
-## Description of the assigment
-In this assignment we have to develop a software architecture for the control of the robot in the environment. The sofware is rely on the move_base and gmapping packages for localizing the robot and the plan motion.
-The architecture is able to get the user request, and let the robot execute one of the following behaviors:
-1. Autonomously reach a x,y coordinate inserted by the user
-2. Let the user drive the robot with the keyboard without any control for collision
-3. Let the user drive the robot assisting them to avoid collisions
-
-In the first case, if the user insert a target that cannot be reached the program should tell it to the user and cancel the goal.
-In the third case, instead, the robot didn't go forward if there is an obsacle in the front and didn't turn left/right if there are obstacles on the left/right.
+# Research Track 2: Jupyter Notebook
+## Description of the assignment
+Starting from the third assignment of the course of Research Track 1 we have to create a jupyter notebook to interact with the simulation of it, that will be able to:
+1. Switch to the different modalities, and manage them
+2. Plot the robot position, the laser scanner data and reached / not reached targets
 
 ## How to install and run the code
-To run the code is first necessary to install xterm with the following command:
-```
-sudo apt-get install xterm
-```
-Before start check if the .py files are executable.  
-In orther to use the software run the command:
+To use the jupyter user interface, first is necessary to launch the ROS environment with these three launcher: 
 ```
 roslaunch final_assignment simulation_gmapping.launch
 ```
@@ -23,68 +13,28 @@ roslaunch final_assignment simulation_gmapping.launch
 roslaunch final_assignment move_base.launch
 ```
 ```
-roslaunch assignment_3 main.launch
+roslaunch RT2_jpy_assignment jpy_launch.launch
 ```
-
-## Documentation
-Documentation for the code of the assignment is avaiable at this [link](https://dariaberretta.github.io/assignment_03/)
-
-
-## Workflow of the code
-The main node of this software is the 'userInteractionNode'. Through it the user chooses which of the three actions performs.
-The 'userInteractionNode' implements two different client to two different service.  
-When the user decides to performes the action 1 (autonomously reach a x,y coordinate) the node create a client for the 'reachCoordinateService'
+ And then open the jupyter notebook:
 ```
-float64 x
-float64 y
----
-int32 ret
+NB_assignment_3.ipynb
 ```
-The server for this service is implemented in the 'reachCoordinateNode', which with the use of a simple action client to the 'MoveBaseAction' make a goal request with the coordinates recived by the 'reachCoordinateService'.  
-If the goal is reached within a time limit the service's return is set to 1, instead if the goal is not reached the return is set to 0.  
-This value, then, is read in the 'userInteractionNode' to inform the user if the position have been reached or not.
+ 
 
-Instead, when the user decides to call action 2 or action 3, the node create a client to the 'keyboardService' with two different values for the parameter 'action': 
-```
-int32 action
----
-int32 return
-```
-If the value of the parameter is set to 0, the 'teleopeNode' which implement the server for the 'keyboardService' calls the 'teleop_twist_keyboard' node. This node allows the user to navigate the robot via keyboard, as desired.  
-On the contrary if the parameter is set to 1, the 'teleopeNode' calls the 'option3' launch file:
-```xml
-<?xml version="1.0"?>
+## Structure of the code
+The graphic interface allows the user to choose if he wants the robot to reach a point, or if he prefers to guide the robot himself.  
+In the first case, the interface will allow the user to enter the coordinates (x, y) of the target, and start the task by pressing the "start" button or cancelling the operation using the "undo" button.  
+In the second case, 9 different buttons are displayed that can be used to guide the robot, and in addition the map on which it moves is displayed.
+There is also a slider to allow the user to choose if he wants help in guiding the robot, blocking it before it collides with walls.  
+Also in this case is present the "undo" button.  
+In any case, three graphs are continuously displayed and updated. The first shows the path taken by the robot. The second shows the data from the laser scanner. While the third shows a histogram of the targets reached or not by the robot.
 
-<launch>
-    <node name="option3" pkg="assignment_3" type="teleopContrNode.py"/>
-    <remap from="cmd_vel" to="remap_cmd_vel" />
 
-    <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" />
-
-</launch>
-```
-As you can see, within the launch file the topic 'cmd_vel' is remap to another topic 'remap_cmd_vel'.  
-In this way, inside the 'teleopContrNode' node that is called, it is possible to execute some instructions to prevent the robot from colliding with the walls, partially overwriting the commands requested by the user.
-
-![](Immagine.png)
-
-## Details
-To achieve the movement of the robot in the first and second cases, it was mainly necessary to implement two services.  
-In the first case, however, a simple action client was also used. It sends a goal to the action server implemented by the 'move_base' package.  
-In the second case it was only necessary to call the node 'teleop_twist_keyboard' which allows the user to navigate the robot by posting on the topic 'cmd_vel'.  
-The most particular case was the implementation of the third point. In fact, it was necessary to create a node to control the movements of the robot, to prevent it from hitting the walls, and it was also necessary to remap the topic 'cmd_val' used by the node 'teleop_twist_keyboard', to topic 'remap_cmd_vel'.  
-To avoid the walls, the robot's 180 ° field of view was used, divided into three different sections and monitored the minimum distance of the robot from the walls for each section.  
-If a distance of one of the three sections is too small, the robot is not allowed to proceed in that direction.
-
-## Idications
-The software user interface is as follows:
-![](userInterface.png)
-To select an action, the user must enter the corresponding number in the shell named 'userInterfaceNode'.  
-When the user selects action 2 or action 3, "the command" switches to the shell named teleopeNode.  
-If the user has selected option 2, and has finished his action, to return to the selection menu he must press the 'Crtl + C' command once.  
-If the user has selected option 3, to return to the selection menu he will must press the command 'Ctrl + C' twice, once to exit to the 'teleope_twist_keyboard', and once to exit to the 'teleopContrNode'.  
-To exit the selection menu, press the '0' key.  
-To permanently close the program, you need to close the main shell.
+## Some issue
+Although apparently convenient a single interface that allows you to control the robot, unfortunately the interface is very slow.  
+The most significant example is the slowdown suffered by the robot when it is assigned a task to achieve, which also puts the graphs on hold.
+Also, even when the user chooses to drive the robot, the button "responsiveness" is low and the graphics update is very slow.
 
 ## 
 **Authors:** Daria Berretta
+
